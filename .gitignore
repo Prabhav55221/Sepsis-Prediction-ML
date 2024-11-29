@@ -1,0 +1,44 @@
+# System files
+.DS_Store
+Thumbs.db
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*.so
+
+# Jupyter Notebooks
+*.ipynb
+!README.ipynb
+
+# Temporary Jupyter files
+.ipynb_checkpoints/
+
+# Slurm output files
+slurm-*.out
+
+# Logs and temp files
+*.log
+*.tmp
+
+# VSCode settings
+.vscode/
+
+# Data files
+/data/*.csv
+/data/*.json
+/data/*.xlsx
+
+# Logs
+logs
+
+# Test data and temporary files
+/tests/.DS_Store
+/tests/__pycache__/
+
+# Core metric cache
+/core_score/.DS_Store
+/core_score/__pycache__/
+
+data/preprocessed_data
+data/physionet.org/files/challenge-2019/1.0.0/sources
