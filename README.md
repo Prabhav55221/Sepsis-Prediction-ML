@@ -41,3 +41,4 @@ mkdir data/preprocessed_data
 mkdir logs
 python preprocess.py
 ```
+Now you should have train, test and val JSON in the path ```data/preprocessed_data```.
