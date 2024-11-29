@@ -3,91 +3,106 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import json
+import random
+import logging
+
 
 class DataVisualization:
     def __init__(self, json_path):
+
+        # Set up logging
+        logging.basicConfig(
+            filename="./logs/visualization.log",
+            level=logging.INFO,
+            format="%(asctime)s - %(levelname)s - %(message)s",
+        )
+        
+        logging.info("Initializing DataVisualization class.")
+
         # Load data from JSON
         with open(json_path, "r") as f:
-            self.data = pd.DataFrame(json.load(f))
+            self.data = json.load(f)
         self.output_folder = "data/visualizations/"
         os.makedirs(self.output_folder, exist_ok=True)
+        logging.info(f"Output folder set to {self.output_folder}.")
 
-    def plot_time_series(self, feature):
-        """Plots time series trends for a given feature."""
-        plt.figure(figsize=(10, 6))
-        sns.lineplot(
-            data=self.data,
-            x="ICULOS",
-            y=feature,
-            hue="SepsisLabel",
-            palette="tab10",
-        )
-        plt.title(f"Time Series Plot: {feature} (Sepsis vs Non-Sepsis)")
+    def extract_flat_data(self):
+        """Extract flat data for aggregation and distribution plots."""
+        records = []
+        for patient_id, patient_data in self.data.items():
+            sepsis_label = patient_data.get("sepsis_label", 0)
+            for observation in patient_data["timeseries"]:
+                observation["sepsis_label"] = sepsis_label
+                observation["PatientID"] = patient_id
+                records.append(observation)
+        return pd.DataFrame(records)
+
+    def plot_patient_level(self, feature, sepsis_label, num_patients=10):
+        """Plots time series for multiple patients in one plot."""
+        patients = [pid for pid, pdata in self.data.items() if pdata.get("sepsis_label", 0) == sepsis_label]
+        selected_patients = random.sample(patients, min(num_patients, len(patients)))
+        logging.info(f"Selected {len(selected_patients)} patients for sepsis_label={sepsis_label}.")
+
+        plt.figure(figsize=(12, 8))
+        for patient_id in selected_patients:
+            timeseries = pd.DataFrame(self.data[patient_id]["timeseries"])
+            if feature in timeseries:
+                sns.lineplot(
+                    data=timeseries,
+                    x="ICULOS",
+                    y=feature,
+                    label=f"Patient {patient_id}",
+                    alpha=0.7,
+                )
+
+        plt.title(f"Time Series of {feature} (Sepsis={sepsis_label}) for {num_patients} Patients")
         plt.xlabel("ICULOS (Time)")
         plt.ylabel(feature)
-        plt.legend(title="SepsisLabel", labels=["Non-Sepsis", "Sepsis"])
-        output_path = os.path.join(self.output_folder, f"time_series_{feature}.png")
+        plt.legend(title="Patients", bbox_to_anchor=(1.05, 1), loc="upper left")
+        plt.tight_layout()
+        output_path = os.path.join(self.output_folder, f"patients_{feature}_sepsis_{sepsis_label}.png")
         plt.savefig(output_path)
         plt.close()
-        print(f"Saved time series plot for {feature} to {output_path}")
+        logging.info(f"Saved combined time series plot for {feature} (Sepsis={sepsis_label}) to {output_path}.")
 
-    def plot_feature_distribution(self, feature):
-        """Plots the distribution of a feature for Sepsis vs Non-Sepsis cases."""
+    def plot_aggregated_trends(self, feature):
+        """Plots aggregated trends of a feature for sepsis and non-sepsis patients."""
+        flat_data = self.extract_flat_data()
         plt.figure(figsize=(10, 6))
-        sns.histplot(
-            data=self.data,
-            x=feature,
-            hue="SepsisLabel",
-            kde=True,
-            palette="tab10",
-            bins=30,
-        )
+        sns.lineplot(data=flat_data, x="ICULOS", y=feature, hue="sepsis_label", estimator="mean", ci="sd")
+        plt.title(f"Aggregated Trends of {feature} (Sepsis vs Non-Sepsis)")
+        plt.xlabel("ICULOS (Time)")
+        plt.ylabel(feature)
+        output_path = os.path.join(self.output_folder, f"aggregated_{feature}.png")
+        plt.savefig(output_path)
+        plt.close()
+        logging.info(f"Saved aggregated trends plot for {feature} to {output_path}.")
+
+    def plot_counts(self):
+        """Plots counts of sepsis vs non-sepsis patients."""
+        sepsis_counts = pd.Series({pid: pdata["sepsis_label"] for pid, pdata in self.data.items()})
+        plt.figure(figsize=(8, 6))
+        sns.countplot(x=sepsis_counts, palette="tab10")
+        plt.title("Counts of Sepsis vs Non-Sepsis Patients")
+        plt.xlabel("sepsis_label")
+        plt.ylabel("Number of Patients")
+        output_path = os.path.join(self.output_folder, "sepsis_counts.png")
+        plt.savefig(output_path)
+        plt.close()
+        logging.info(f"Saved sepsis count plot to {output_path}.")
+
+    def plot_feature_distributions(self, feature):
+        """Plots feature distributions for sepsis vs non-sepsis patients."""
+        flat_data = self.extract_flat_data()
+        plt.figure(figsize=(10, 6))
+        sns.histplot(data=flat_data, x=feature, hue="sepsis_label", kde=True, palette="tab10")
         plt.title(f"Distribution of {feature} (Sepsis vs Non-Sepsis)")
         plt.xlabel(feature)
         plt.ylabel("Frequency")
         output_path = os.path.join(self.output_folder, f"distribution_{feature}.png")
         plt.savefig(output_path)
         plt.close()
-        print(f"Saved distribution plot for {feature} to {output_path}")
-
-    def plot_correlation_heatmap(self):
-        """Plots a heatmap of correlations between features."""
-        plt.figure(figsize=(12, 10))
-        correlation_matrix = self.data.corr()
-        sns.heatmap(
-            correlation_matrix,
-            annot=False,
-            cmap="coolwarm",
-            fmt=".2f",
-            cbar=True,
-        )
-        plt.title("Correlation Heatmap of Features")
-        output_path = os.path.join(self.output_folder, "correlation_heatmap.png")
-        plt.savefig(output_path)
-        plt.close()
-        print(f"Saved correlation heatmap to {output_path}")
-
-    def plot_missing_data(self):
-        """Plots a heatmap of missing data."""
-        plt.figure(figsize=(12, 6))
-        sns.heatmap(self.data.isnull(), cbar=False, cmap="viridis")
-        plt.title("Missing Data Heatmap")
-        output_path = os.path.join(self.output_folder, "missing_data_heatmap.png")
-        plt.savefig(output_path)
-        plt.close()
-        print(f"Saved missing data heatmap to {output_path}")
-
-    def plot_boxplots_by_sepsis(self, feature):
-        """Plots boxplots of a feature grouped by SepsisLabel."""
-        plt.figure(figsize=(10, 6))
-        sns.boxplot(data=self.data, x="SepsisLabel", y=feature, palette="tab10")
-        plt.title(f"Boxplot of {feature} by SepsisLabel")
-        plt.xlabel("SepsisLabel")
-        plt.ylabel(feature)
-        output_path = os.path.join(self.output_folder, f"boxplot_{feature}.png")
-        plt.savefig(output_path)
-        plt.close()
-        print(f"Saved boxplot for {feature} to {output_path}")
+        logging.info(f"Saved distribution plot for {feature} to {output_path}.")
 
 
 if __name__ == "__main__":
@@ -97,13 +112,19 @@ if __name__ == "__main__":
     # Initialize the visualization class
     visualizer = DataVisualization(json_file_path)
 
-    # Perform visualizations
+    # Patient-level analysis (combined plots)
     features_to_visualize = ["HR", "O2Sat", "Temp", "SBP", "MAP"]
     for feature in features_to_visualize:
-        visualizer.plot_time_series(feature)
-        visualizer.plot_feature_distribution(feature)
-        visualizer.plot_boxplots_by_sepsis(feature)
+        visualizer.plot_patient_level(feature, sepsis_label=1, num_patients=10)  # Patients with sepsis
+        visualizer.plot_patient_level(feature, sepsis_label=0, num_patients=10)  # Patients without sepsis
 
-    # Additional visualizations
-    visualizer.plot_correlation_heatmap()
-    visualizer.plot_missing_data()
+    # Aggregated trends
+    for feature in features_to_visualize:
+        visualizer.plot_aggregated_trends(feature)
+
+    # Count plot
+    visualizer.plot_counts()
+
+    # Feature distributions
+    for feature in features_to_visualize:
+        visualizer.plot_feature_distributions(feature)

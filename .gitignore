@@ -42,3 +42,4 @@ logs
 
 data/preprocessed_data
 data/physionet.org/files/challenge-2019/1.0.0/sources
+data/visualizations
