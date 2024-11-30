@@ -1,19 +1,36 @@
 name: ml_project
 channels:
+  - conda-forge
   - defaults
 dependencies:
-  - python=3.8
+  - python=3.8.18
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - xgboost
+  - pgmpy
+  - pygraphviz
+  - jinja2
+  - joblib
+  - tqdm
+  - graphviz
   - pip
   - pip:
-      - matplotlib
-      - numpy
-      - pandas
-      - seaborn
-      - scikit-learn
-      - pgmpy
-      - torch
+      - cachetools
+      - certifi
+      - charset-normalizer
+      - google-api-core
+      - google-auth
+      - googleapis-common-protos
+      - grpcio
+      - grpcio-status
+      - importlib-resources
+      - markupsafe
+      - protobuf
+      - requests
+      - rsa
       - statsmodels
-      - tqdm
-      - ipykernel
-      - jupyter
-  - pygraphviz
+      - torch

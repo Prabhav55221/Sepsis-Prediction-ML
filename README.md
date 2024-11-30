@@ -25,7 +25,13 @@ cd Sepsis-Prediction-ML
 conda env create -f environment.yml
 ```
 
-#### Data
+Note that if you are using an Apple Silicon based Macbook, you will have to download the below library with brew for XGBoost to Work:
+
+```bash
+brew install libomp
+```
+
+#### Base Data
 
 We provide the data required for this project as part of this Github Repo. You can access the original data, if required, by running the below command. We however, store the data in the repo in the directory ```./data/physionet.org```.
 
@@ -41,4 +47,53 @@ mkdir data/preprocessed_data
 mkdir logs
 python preprocess.py
 ```
+
 Now you should have train, test and val JSON in the path ```data/preprocessed_data```.
+
+#### Replication of Results
+
+Follow the below steps to replicate:
+
+**Step 1**
+
+Create the visualizations used by us in our writeup. For this, run the below command as it is. If you want to observe different visualizations, feel free to change the parameters in the main function for python file.
+
+```bash
+python visualization_analysis.py
+```
+
+Logs will be stored in the ```./logs``` folder. Visualizations will be in ```data/visualizations```.
+
+**Step 2**
+
+Missing Data Handling and Aggregation - As described in the writeup, we impute missing data and then aggregate to create training data. For this, run the below command - processed_data will be stored in ```data/processed_data```.
+
+```bash
+python data_cleanse.py
+```
+
+**Step 3**
+
+Train the models! As described in writeup, we use two models - **Bayesian Network with Hill Climb**, **XGBoost**. You can run both models in below way and experiement with the parameters based on your use-case. To replicate our results (best), just use the commands below:
+
+- Train Bayesian Model & Evaluate
+
+```bash
+python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model bayesian --scoring_method "bicscore"
+
+python evaluate.py --pred_file data/predictions/test_predictions_bayesian.csv --output_path data/results/test_evaluation_bayesian.txt
+python evaluate.py --pred_file data/predictions/val_predictions_bayesian.csv --output_path data/results/val_evaluation_bayesian.txt
+```
+
+- Train XGBoost & Evaluate
+
+```bash
+python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --n_estimators 300 --max_depth 10
+
+python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost.txt
+python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost.txt
+```
+
+You should now be able to see the results in ``` data/results/ ```!
+
+For any issues, please mail us!
