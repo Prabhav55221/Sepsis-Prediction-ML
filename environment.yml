@@ -1,4 +1,4 @@
-name: ml_project
+name: sepsis-prediction
 channels:
   - conda-forge
   - defaults
@@ -11,12 +11,8 @@ dependencies:
   - matplotlib
   - seaborn
   - xgboost
-  - pgmpy
-  - pygraphviz
   - jinja2
   - joblib
-  - tqdm
-  - graphviz
   - pip
   - pip:
       - cachetools
@@ -34,3 +30,7 @@ dependencies:
       - rsa
       - statsmodels
       - torch
+      - pgmpy
+      - pygraphviz
+      - tqdm
+      - graphviz

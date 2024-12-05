@@ -11,6 +11,10 @@ Submitted By:
     Sandesh Rangreji (srangre1)
 ```
 
+Link to Presentation - https://docs.google.com/presentation/d/1g3y-otPHT_9zfrosbfByGmatw2ygRKpEWuV1QGrEMes/edit?usp=sharing
+
+The Writeup is Uploaded with the Repository. Please contact us if data takes too long to preprocess - We can upload the same on Drive if needed.
+
 ## Setup For Replication
 
 #### Environment Setup
@@ -78,6 +82,8 @@ Train the models! As described in writeup, we use two models - **Bayesian Networ
 
 - Train Bayesian Model & Evaluate
 
+The Bayesian Model will also store the selected features in the results folder. Please refer to that to see the final features. Please refer to the code for other options. Below are the one's we used for the final version.
+
 ```bash
 python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model bayesian --scoring_method "bicscore"
 
@@ -88,7 +94,18 @@ python evaluate.py --pred_file data/predictions/val_predictions_bayesian.csv --o
 - Train XGBoost & Evaluate
 
 ```bash
-python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --n_estimators 300 --max_depth 10
+
+# If you want to train the Bayesian Version
+python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --gridcv True --use_graph_cols True
+
+python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost.txt
+python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost.txt
+```
+
+```bash
+
+# If you want to train on all features
+python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --gridcv True
 
 python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost.txt
 python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost.txt
