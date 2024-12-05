@@ -46,7 +46,7 @@ wget -r -N -c -np https://physionet.org/files/challenge-2019/1.0.0/
 Once you have cloned the repo, please run the first script to preprocess the data and create the train, test and validation data in JSON format. Refer to our paper to understand the data storage format.
 
 ```bash
-conda activate ml_project
+conda activate sepsis-prediction
 mkdir data/preprocessed_data
 mkdir logs
 python preprocess.py
