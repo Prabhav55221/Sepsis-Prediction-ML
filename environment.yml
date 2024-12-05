@@ -31,6 +31,4 @@ dependencies:
       - statsmodels
       - torch
       - pgmpy
-      - pygraphviz
       - tqdm
-      - graphviz
