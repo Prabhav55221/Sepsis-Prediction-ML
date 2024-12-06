@@ -297,6 +297,8 @@ def main():
 
     args = parser.parse_args()
 
+    os.makedirs('./data/results')
+
     os.makedirs(args.output_dir, exist_ok=True)
     os.makedirs(args.pred_dir, exist_ok=True)
 
