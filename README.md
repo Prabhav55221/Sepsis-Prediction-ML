@@ -93,6 +93,8 @@ python evaluate.py --pred_file data/predictions/val_predictions_bayesian.csv --o
 
 - Train XGBoost & Evaluate
 
+DISCLAIMER - Please run the Bayesian model first if you want to run the XGBOOST on Bayesian Features.
+
 ```bash
 
 # If you want to train the Bayesian Version
