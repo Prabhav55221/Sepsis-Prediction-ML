@@ -107,8 +107,8 @@ python evaluate.py --pred_file data/predictions/val_predictions_bayesian.csv --o
 # If you want to train the Bayesian Version
 python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --gridcv True --use_graph_cols True
 
-python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost.txt
-python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost.txt
+python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost_bayesian.txt
+python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost_bayesian.txt
 ```
 
 ```bash
@@ -116,8 +116,8 @@ python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --o
 # If you want to train on all features
 python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --gridcv True
 
-python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost.txt
-python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost.txt
+python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost_full.txt
+python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost_full.txt
 ```
 
 You should now be able to see the results in ``` data/results/ ```!
