@@ -82,6 +82,36 @@ logging.basicConfig(
 )
 logging.info("Initializing Training class.")
 
+def augment_data(X, y, target_label=1, ratio=1):
+    """
+    Oversamples the minority class to achieve a desired ratio.
+
+    Parameters:
+    - X: Feature matrix.
+    - y: Target labels.
+    - target_label: The label to oversample (default is 1 for sepsis).
+    - ratio: Desired minority-to-majority ratio (default is 0.5).
+
+    Returns:
+    - Augmented X and y.
+    """
+    logging.info("Performing data augmentation for class imbalance.")
+    # Separate the minority and majority classes
+    X_minority = X[y != target_label]
+    y_minority = y[y != target_label]
+    X_majority = X[y == target_label]
+    y_majority = y[y == target_label]
+    
+    # Determine the target number of samples for the minority class
+    n_target = int(len(y_majority) * ratio)
+    
+    # Oversample the minority class
+    oversampled_X = pd.concat([X_majority, X_minority.sample(n=n_target, replace=True)])
+    oversampled_y = pd.concat([y_majority, y_minority.sample(n=n_target, replace=True)])
+    
+    logging.info(f"Data augmentation complete. Minority class size: {n_target}")
+    return oversampled_X, oversampled_y
+
 # Class for Bayesian Network
 class GraphicalModel:
     def __init__(self):
@@ -294,6 +324,7 @@ def main():
     parser.add_argument("--max_depth", type=int, default=3, help="Max depth for XGBoost.")
     parser.add_argument("--use_graph_cols", type=bool, default=False, help="Should the model use feature selection.")
     parser.add_argument("--gridcv", type=bool, default=False, help="Do Tuning")
+    parser.add_argument("--augment", type=bool, default=False, help="Perform data augmentation for sepsis_label=1.")
 
     args = parser.parse_args()
 
@@ -347,6 +378,10 @@ def main():
         X_val = val_data.drop(columns=["sepsis_label", "PatientID"], errors="ignore")
         y_val = val_data["sepsis_label"]
         X_test = test_data.drop(columns=["sepsis_label", "PatientID"], errors="ignore")
+
+        if args.augment:
+            logging.info("Data augmentation enabled.")
+            X_train, y_train = augment_data(X_train, y_train)
 
         if args.use_graph_cols:
             # Read the file and process the variable list

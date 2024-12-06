@@ -120,6 +120,23 @@ python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --ou
 python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost_full.txt
 ```
 
+- Augmented Training & Evaluation
+
+```bash
+python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --gridcv True --use_graph_cols True --augment True
+
+python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost_bayesian_augment.txt
+python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost_bayesian_augment.txt
+```
+
+```bash
+# If you want to train on all features
+python model_training.py --train data/processed_data/processed_train.csv --val data/processed_data/processed_val.csv --test data/processed_data/processed_test.csv --model xgboost --gridcv True --augment True
+
+python evaluate.py --pred_file data/predictions/val_predictions_xgboost.csv --output_path data/results/val_evaluation_xgboost_full_augment.txt
+python evaluate.py --pred_file data/predictions/test_predictions_xgboost.csv --output_path data/results/test_evaluation_xgboost_full_augment.txt
+```
+
 You should now be able to see the results in ``` data/results/ ```!
 
 For any issues, please mail us!
